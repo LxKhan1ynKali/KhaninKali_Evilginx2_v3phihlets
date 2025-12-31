@@ -1,4 +1,4 @@
-# KhaninKali_Evilginx2_v3phihlets
+s# KhaninKali_Evilginx2_v3phihlets
 This are phishlets are not from secondary source Purely made by KhaninKali
 
 > Structure shown for clarity only.
@@ -32,3 +32,5 @@ The author is **not responsible** for misuse of information outside lawful, ethi
 you’re not doing offensive security — you’re just running tools.*
 
 ⚔️ **Research. Break. Learn. Repeat.**
+--Also there are some modified phishlets 
+//The non functional phishlets coverted to functional
